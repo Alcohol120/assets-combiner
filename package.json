@@ -1,0 +1,49 @@
+{
+  "name": "assets-combiner",
+  "version": "0.0.1",
+  "author": {
+    "name": "Alco",
+    "email": "head@alclab.pro",
+    "url": "http://alclab.pro/"
+  },
+  "description": "Provides file including for JS/CSS/HTML files",
+  "homepage": "https://github.com/ALcohol120/assets-combiner",
+  "license": "BSD-2-Clause",
+  "engines": {
+    "node": ">=8"
+  },
+  "keywords": [
+    "assets-combiner",
+    "assets",
+    "minify",
+    "minifier",
+    "combine",
+    "assemble",
+    "javascript",
+    "ecmascript",
+    "es5",
+    "es6",
+    "es7",
+    "es8",
+    "es2015",
+    "es2016",
+    "es2017",
+    "html",
+    "html5",
+    "css",
+    "css3",
+    "html5"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alcohol120/assets-combiner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Alcohol120/assets-combiner/issues"
+  },
+  "deprecated": false,
+  "bin": {
+    "assets-combiner": "./assets-combiner.js"
+  },
+  "dependencies": {}
+}
