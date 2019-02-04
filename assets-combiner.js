@@ -8,8 +8,8 @@ class Collection {
 
     constructor(assets_type, source_path, output_path) {
         this.assets_type = assets_type;
-        this.source_path = Collection.fixPath(fs.realpathSync('') + '/' + source_path);
-        this.output_path = Collection.fixPath(fs.realpathSync('') + '/' + output_path);
+        this.source_path = Collection.fixPath(source_path);
+        this.output_path = Collection.fixPath(output_path);
         this.files = {};
     }
 
