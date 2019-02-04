@@ -2,13 +2,14 @@
 'use strict';
 
 const fs = require('fs');
+const crypt = require('crypto');
 
 class Collection {
 
     constructor(assets_type, source_path, output_path) {
         this.assets_type = assets_type;
-        this.source_path = Collection.fixPath(source_path);
-        this.output_path = Collection.fixPath(output_path);
+        this.source_path = Collection.fixPath(fs.realpathSync('') + '/' + source_path);
+        this.output_path = Collection.fixPath(fs.realpathSync('') + '/' + output_path);
         this.files = {};
     }
 
@@ -42,9 +43,13 @@ class Collection {
                 let path = Collection.getFilePath(new_path);
                 if(!fs.existsSync(this.output_path + path)) {
                     fs.mkdirSync(this.output_path + path);
+                } else if(fs.existsSync(this.output_path + new_path)) {
+                    let content = fs.readFileSync(this.output_path + new_path);
+                    let hash = crypt.createHash('sha256').update(content).digest('hex');
+                    let new_hash = crypt.createHash('sha256').update(this.files[filename].content).digest('hex');
+                    if(hash === new_hash) continue;
                 }
                 fs.writeFileSync(this.output_path + new_path, this.files[filename].content);
-                console.log(this.output_path + new_path);
             }
         }
     }
