@@ -41,6 +41,8 @@ class Collection {
         let includes = null;
         if(this.assets_type === 'html') {
             includes = this.files[filename].content.match(/<!--@include\(.*?\)-->/ig);
+        } else if(this.assets_type === 'js') {
+            includes = this.files[filename].content.match(/(\/\*@include\(.*?\)\*\/)|(\/\/@include\(.*?\))/ig);
         } else {
             includes = this.files[filename].content.match(/\/\*@include\(.*?\)\*\//ig);
         }

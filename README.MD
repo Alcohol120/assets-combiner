@@ -22,6 +22,10 @@ JS files:
 
     /*@include(path/to/file.js)*/
     
+or
+
+    //@include(path/to/file.js)
+    
 CSS files:
     
     /*@include(path/to/file.css)*/
