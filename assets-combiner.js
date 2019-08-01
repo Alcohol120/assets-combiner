@@ -46,16 +46,34 @@ class Collection {
         } else {
             includes = this.files[filename].content.match(/\/\*@include\(.*?\)\*\//ig);
         }
-        if(includes)
+        if(includes) {
             for(let matched in includes) {
                 let path = includes[matched].match(/\((.*?)\)/i);
                 if(!path || !path.hasOwnProperty(1) || !path[1]) continue;
-                path = Collection.fixPath(fs.realpathSync(Collection.getFilePath(filename) + path[1]), true);
-                let content = this.files[filename].content;
-                content = content.replace(includes[matched], this.combineFile(path, count));
-                this.files[filename].content = content;
-                this.files[path].included++;
+                let segments = path[1].split('/').reverse();
+                if(segments[0] === '*') {
+                    // directory including
+                    let ext = '.' + this.assets_type;
+                    let directory = segments.slice(1, segments.length).reverse().join('/');
+                    directory = Collection.fixPath(fs.realpathSync(Collection.getFilePath(filename) + directory));
+                    let content = '';
+                    for(let file in this.files) {
+                        if(file.indexOf(directory) !== 0 || file.slice(file.length - ext.length) !== ext) continue;
+                        if(content.length > 0) content += '\n';
+                        content += this.combineFile(file, count);
+                        this.files[file].included++;
+                    }
+                    this.files[filename].content = this.files[filename].content.replace(includes[matched], content);
+                } else {
+                    // single file including
+                    path = Collection.fixPath(fs.realpathSync(Collection.getFilePath(filename) + path[1]), true);
+                    let content = this.files[filename].content;
+                    content = content.replace(includes[matched], this.combineFile(path, count));
+                    this.files[filename].content = content;
+                    this.files[path].included++;
+                }
             }
+        }
         return this.files[filename].content;
     }
 

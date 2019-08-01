@@ -33,3 +33,9 @@ CSS files:
 HTML files:
 
     <!--@include(path/to/file.html)-->
+    
+Including all files in directory and sub-directories recursively
+
+**Warning:** This will include files with alphabetical sorting. Don't use it if including order is important for you.
+
+    @include(path/to/catalog/*)
