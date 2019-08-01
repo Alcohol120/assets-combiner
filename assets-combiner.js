@@ -8,28 +8,9 @@ class Collection {
 
     constructor(assets_type, source_path, output_path) {
         this.assets_type = assets_type;
-        this.source_path = Collection.fixPath(source_path);
-        this.output_path = Collection.fixPath(output_path);
+        this.source_path = Collection.fixPath(fs.realpathSync(source_path));
+        this.output_path = Collection.fixPath(fs.realpathSync(output_path));
         this.files = {};
-    }
-
-    isValidAssetsType() {
-        if(this.assets_type === 'js') {
-            return true;
-        } else if(this.assets_type === 'css') {
-            return true;
-        } else if(this.assets_type === 'html') {
-            return true;
-        }
-        return false;
-    }
-
-    isValidSourcePath() {
-        return Collection.isValidPath(this.source_path);
-    }
-
-    isValidOutputPath() {
-        return Collection.isValidPath(this.source_path);
     }
 
     combine() {
@@ -115,9 +96,13 @@ options.splice(0, 2);
 
 for(let d = 0; d < Math.floor(options.length / 3); d++) {
     let i = d * 3;
-    let collection = new Collection(options[i], options[i + 1], options[i + 2]);
-    if(!collection.isValidAssetsType()) throw new Error('Invalid assets type: ' + collection.assets_type);
-    if(!collection.isValidSourcePath()) throw new Error('Invalid source path: ' + collection.source_path);
-    if(!collection.isValidOutputPath()) throw new Error('Invalid output path: ' + collection.output_path);
-    collection.combine();
+    let assets_type = options[i];
+    let source_path = options[i + 1];
+    let output_path = options[i + 2];
+    if(['js', 'css', 'html'].indexOf(assets_type) < 0) throw new Error('Invalid assets type: ' + assets_type);
+    if(!Collection.isValidPath(source_path)) throw new Error('Invalid source path: ' + source_path);
+    if(!Collection.isValidPath(output_path)) throw new Error('Invalid output path: ' + output_path);
+    if(!fs.existsSync(source_path)) throw new Error('Source directory is not exists: ' + source_path);
+    if(!fs.existsSync(output_path)) throw new Error('Output directory is not exists: ' + output_path);
+    new Collection(assets_type, source_path, output_path).combine();
 }
