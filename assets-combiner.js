@@ -117,8 +117,8 @@ options.splice(0, 2);
 for(let d = 0; d < Math.floor(options.length / 3); d++) {
     let i = d * 3;
     let assets_type = options[i];
-    let source_path = options[i + 1];
-    let output_path = options[i + 2];
+    let source_path = Collection.fixPath(options[i + 1]);
+    let output_path = Collection.fixPath(options[i + 2]);
     if(['js', 'css', 'html'].indexOf(assets_type) < 0) throw new Error('Invalid assets type: ' + assets_type);
     if(!Collection.isValidPath(source_path)) throw new Error('Invalid source path: ' + source_path);
     if(!Collection.isValidPath(output_path)) throw new Error('Invalid output path: ' + output_path);
