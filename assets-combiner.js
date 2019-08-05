@@ -6,10 +6,11 @@ const crypt = require('crypto');
 
 class Collection {
 
-    constructor(assets_type, source_path, output_path) {
+    constructor(assets_type, source_path, output_path, config) {
         this.assets_type = assets_type;
         this.source_path = Collection.fixPath(fs.realpathSync(source_path));
         this.output_path = Collection.fixPath(fs.realpathSync(output_path));
+        this.config = config;
         this.files = {};
     }
 
@@ -74,6 +75,21 @@ class Collection {
                 }
             }
         }
+        let vars = null;
+        if(this.assets_type === 'html') {
+            vars = this.files[filename].content.match(/<!--@var\(.*?\)-->/ig);
+        } else if(this.assets_type === 'js') {
+            vars = this.files[filename].content.match(/(\/\*@var\(.*?\)\*\/)|(\/\/@var\(.*?\))/ig);
+        } else {
+            vars = this.files[filename].content.match(/\/\*@var\(.*?\)\*\//ig);
+        }
+        if(vars) {
+            for(let matched in vars) {
+                let key = vars[matched].match(/\((.*?)\)/i);
+                if(!this.config.hasOwnProperty(key[1])) continue;
+                this.files[filename].content = this.files[filename].content.replace(vars[matched], this.config[key[1]]);
+            }
+        }
         return this.files[filename].content;
     }
 
@@ -114,15 +130,28 @@ class Collection {
 let options = process.argv;
 options.splice(0, 2);
 
-for(let d = 0; d < Math.floor(options.length / 3); d++) {
+for(let d = 0; d < Math.floor(options.length / 4); d++) {
     let i = d * 3;
     let assets_type = options[i];
     let source_path = Collection.fixPath(options[i + 1]);
     let output_path = Collection.fixPath(options[i + 2]);
+    let config_path = (options[i + 3] && options[i + 3] !== '-') ? Collection.fixPath(options[i + 3]) : '';
+    let config = {};
     if(['js', 'css', 'html'].indexOf(assets_type) < 0) throw new Error('Invalid assets type: ' + assets_type);
     if(!Collection.isValidPath(source_path)) throw new Error('Invalid source path: ' + source_path);
     if(!Collection.isValidPath(output_path)) throw new Error('Invalid output path: ' + output_path);
     if(!fs.existsSync(source_path)) throw new Error('Source directory is not exists: ' + source_path);
     if(!fs.existsSync(output_path)) throw new Error('Output directory is not exists: ' + output_path);
-    new Collection(assets_type, source_path, output_path).combine();
+    if(config_path) {
+        if(!Collection.isValidPath(config_path)) throw new Error('Invalid path to config file: ' + config_path);
+        if(!fs.existsSync(config_path)) throw new Error('Config file is not exists: ' + config_path);
+        if(!fs.lstatSync(config_path).isFile()) throw new Error('Config file is a directory: ' + config_path);
+        let lines = fs.readFileSync(config_path).toString().split('\n');
+        for(let i = 0; i < lines.length; i++) {
+            if(!lines[i].trim()) continue;
+            let temp = lines[i].trim().split('=');
+            config[temp[0]] = temp[1];
+        }
+    }
+    new Collection(assets_type, source_path, output_path, config).combine();
 }
