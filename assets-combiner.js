@@ -131,7 +131,7 @@ let options = process.argv;
 options.splice(0, 2);
 
 for(let d = 0; d < Math.floor(options.length / 4); d++) {
-    let i = d * 3;
+    let i = d * 4;
     let assets_type = options[i];
     let source_path = Collection.fixPath(options[i + 1]);
     let output_path = Collection.fixPath(options[i + 2]);
