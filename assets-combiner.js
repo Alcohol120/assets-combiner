@@ -60,6 +60,7 @@ class Collection {
                     let content = '';
                     for(let file in this.files) {
                         if(file.indexOf(directory) !== 0 || file.slice(file.length - ext.length) !== ext) continue;
+                        if(file === filename) continue;
                         if(content.length > 0) content += '\n';
                         content += this.combineFile(file, count);
                         this.files[file].included++;
