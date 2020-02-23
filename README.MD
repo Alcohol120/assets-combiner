@@ -112,3 +112,53 @@ Files or folders witch will not be included in output file even though these all
 
 #### allowed
 Files witch will be included in output file even though these is not allowed by `ext` parameter.
+
+#### layout
+If this property isset all files content will be inserted into layout file. Layout file should contain a `{combiner:layout}` tag. It will be replaced with merged content from other files.
+
+It can be useful if you need, for example, embed some HTML inside certain part of other HTML.
+
+##### Example:
+
+Files structure
+
+    src
+    └── combine.json
+    └── index.html
+    └── embed.html
+    
+index.html
+
+    <html>
+        <head>
+            <title>Layout</title>
+        </head>
+        <body>
+            {combiner:layout}
+        </body>
+    </html>
+    
+embed.html
+
+    <div>
+        <h1>Embed</h1>
+    </div>
+    
+combiner.json
+
+    {
+        "layout": "index.html"
+    }
+    
+Output:
+
+    <html>
+        <head>
+            <title>Layout</title>
+        </head>
+        <body>
+            <div>
+                <h1>Embed</h1>
+            </div>
+        </body>
+    </html>

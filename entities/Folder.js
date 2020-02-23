@@ -27,23 +27,29 @@ class Folder extends Item {
         // collect first ordered items
         if(this.config.hasOwnProperty('includingOrder') && this.config.includingOrder.length > 0) {
             for(let i = 0; i < this.config.includingOrder.length; i++) {
+                if(this.config.hasOwnProperty('layout') && this.config.includingOrder[i] === this.config.layout) continue;
                 if(items.indexOf(this.config.includingOrder[i]) >= 0) this.collect(this.config.includingOrder[i]);
             }
         }
         // collect all files
-        for(let i = 0; i < items.length; i++) this.collect(items[i], true);
+        for(let i = 0; i < items.length; i++) this.collect(items[i], 'files');
         // collect all folders
-        for(let i = 0; i < items.length; i++) this.collect(items[i]);
+        for(let i = 0; i < items.length; i++) this.collect(items[i], 'folders');
+        // collect layout file
+        if(this.config.hasOwnProperty('layout')) {
+            if(items.indexOf(this.config.layout) >= 0) this.collect(this.config.layout, 'layout');
+        }
         return this;
     }
 
-    collect(name, filesOnly=false) {
+    collect(name, type='') {
         if(path.extname(name) === '.json') return;
         if(this.config.hasOwnProperty('excluded') && this.config.excluded.indexOf(name) >= 0) return;
         if(this.names.indexOf(name) >= 0) return;
         let fullPath = fs.realpathSync(this.fullPath + path.sep + name);
         let isFolder = fs.lstatSync(fullPath).isDirectory();
-        if(isFolder && filesOnly) return;
+        if(isFolder && type !== 'folders' && !type) return;
+        if(this.config.hasOwnProperty('layout') && this.config.layout === name && type !== 'layout') return;
         this.names.push(name);
         if(isFolder) {
             this.items.push(new Folder(fullPath, this.types).load());
@@ -58,8 +64,14 @@ class Folder extends Item {
 
     combine() {
         let output = '';
+        let layout = this.config.hasOwnProperty('layout') && this.config.layout ? this.config.layout : false;
         for(let i = 0; i < this.items.length; i++) {
             let item = this.items[i];
+            if(layout && item.name === layout) {
+                layout = fs.readFileSync(item.fullPath).toString();
+                output = layout.replace('{combiner:layout}', output);
+                break;
+            }
             output += '\n';
             if(item.type === 'folder') {
                 output += item.combine();
