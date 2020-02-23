@@ -1,6 +1,6 @@
 Assets Combiner
 ===
-A FileWatcher for merging JS/CSS/HTML files.
+A simple tool for merging your source files into one file
 
 Install
 ---
@@ -8,65 +8,107 @@ Install
 
 Usage
 ---
-###Command line:
+Merge content of all JS files located in ./source/folder directory into a file ./dist.js
 
-    node assets-combiner file_type /path/to/sources/ /path/to/output/ /path/to/config/file
+    node assets-combiner (src=./source/folder&out=./dist.js&ext=js)
     
-Parameter `file_type` allows `js`, `css` and `html` mode.
+Multiple configurations
 
-`/path/to/config/file` is a path to text file. Use `-` to ignore this parameter.
-
-**Config file** is a file witch contain one variable per line, for example:
-
-    app_name=Test app
-    app_version=1.8.5
-
-**Important:** source and output directories should be different to avoid file naming conflicts!
-
-AssetsCombiner supports both relative and absolute paths.
-
-You can use AssetsCombiner for different collections at the same time, for example:
-
-    node assets-combiner html /src/html /out my.cfg js /src/js /out/js my.cfg css /src/css /out/css -
-
-###Include tags
-
-JS files:
-
-    /*@include(path/to/file.js)*/
+    node assets-combiner (src=./src/js&out=./dist1.js&ext=js) (src=./src/html&out=./index.html&ext=html)
     
-or
+Parameters
+---
+#### src
+relative or absolute path to a sources folder
 
-    //@include(path/to/file.js)
+#### out
+relative or absolute path to a output file
+
+#### ext
+file extensions for including
+
+`ext=js` - means only files with .js extensions can be included
+
+`ext=html|htm` - .html and .htm files can be included
+
+`ext=*` - include files with any extension (except .json)
+
+`ext=*|css` - include all files except .css
+
+#### vars
+relative or absolute path to variables file
+`var=./my_vars.json`
+
+this is a JSON file witch can contain some variables. Those variables can be included in output file with following tag: `{combiner:my_variable_name}`
+
+Including order
+---
+All sources including recursively. Files first, sub-folders second. For example the following files structure:
+
+    src
+    ├── sub_dir
+    │   └── file_2.js
+    └── file_1.js
     
-CSS files:
+Will be merged with this order:
+
+    file_1.js
+    file_2.js
+
+combine.json file
+---
+combine.json is an optional, config file witch can be placed in any sources directory.
+
+combine.json provides you options to define merging order, including files witch not allowed by `ext` parameter and exclude allowed files.
+
+#### Basic combine.json structure
+
+    {
+        "includingOrder": [],
+        "excluded": [],
+        "allowed": []
+    }
     
-    /*@include(path/to/file.css)*/
+#### includingOrder
+
+Example files structure:
+
+    src
+    ├── sub_dir
+    │   └── combine.json
+    │   └── file_2.js
+    │   └── file_3.js
+    │   └── file_4.js
+    │   └── file_5.js
+    └── file_1.js
     
-HTML files:
+Example `includingOrder` of `src/sub_dir/combine.json`:
 
-    <!--@include(path/to/file.html)-->
+    {
+        "includingOrder": [
+            "file_4.js",
+            "file_3.js"
+        ]
+    }
     
-Including all files in directory and sub-directories recursively
+Files will be merged with following order:
 
-**Warning:** This will include files with alphabetical sorting. Don't use it if including order is important for you.
-
-    @include(path/to/catalog/*)
+    file_1.js
+    file_4.js
+    file_3.js
+    file_2.js
+    file_5.js
     
-###Variable tags
+By default sub-directories includes after files. We can use `includingOrder` to include directory first, like this:
 
-JS files:
-
-    /*@var(app_version)*/
+    {
+        "includingOrder": [
+            "my_sub_directory"
+        ]
+    }
     
-or
+#### excluded
+Files or folders witch will not be included in output file even though these allowed by `ext` parameter.
 
-    //@var(app_version)
-    
-CSS files:
-
-    /*@var(app_version)*/
-    
-HTML files
-
-    <!--@var(app_version)-->
+#### allowed
+Files witch will be included in output file even though these is not allowed by `ext` parameter.
