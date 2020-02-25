@@ -144,7 +144,7 @@ embed.html
         <h1>Embed</h1>
     </div>
     
-combiner.json
+combine.json
 
     {
         "layout": "index.html"
