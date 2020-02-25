@@ -33,8 +33,10 @@ class Folder extends Item {
         }
         // collect all files
         for(let i = 0; i < items.length; i++) this.collect(items[i], 'files');
+        console.log(this.items, 'files');
         // collect all folders
         for(let i = 0; i < items.length; i++) this.collect(items[i], 'folders');
+        console.log(this.items, 'folders');
         // collect layout file
         if(this.config.hasOwnProperty('layout')) {
             if(items.indexOf(this.config.layout) >= 0) this.collect(this.config.layout, 'layout');
@@ -48,7 +50,7 @@ class Folder extends Item {
         if(this.names.indexOf(name) >= 0) return;
         let fullPath = fs.realpathSync(this.fullPath + path.sep + name);
         let isFolder = fs.lstatSync(fullPath).isDirectory();
-        if(isFolder && type !== 'folders' && !type) return;
+        if(isFolder && type && type !== 'folders') return;
         if(this.config.hasOwnProperty('layout') && this.config.layout === name && type !== 'layout') return;
         this.names.push(name);
         if(isFolder) {
