@@ -33,14 +33,8 @@ class Folder extends Item {
         }
         // collect all files
         for(let i = 0; i < items.length; i++) this.collect(items[i], 'files');
-        console.log(this.items, 'files');
         // collect all folders
         for(let i = 0; i < items.length; i++) this.collect(items[i], 'folders');
-        console.log(this.items, 'folders');
-        // collect layout file
-        if(this.config.hasOwnProperty('layout')) {
-            if(items.indexOf(this.config.layout) >= 0) this.collect(this.config.layout, 'layout');
-        }
         return this;
     }
 
@@ -51,36 +45,35 @@ class Folder extends Item {
         let fullPath = fs.realpathSync(this.fullPath + path.sep + name);
         let isFolder = fs.lstatSync(fullPath).isDirectory();
         if(isFolder && type && type !== 'folders') return;
-        if(this.config.hasOwnProperty('layout') && this.config.layout === name && type !== 'layout') return;
         this.names.push(name);
         if(isFolder) {
             this.items.push(new Folder(fullPath, this.types).load());
         } else {
+            let isLayout = this.config.hasOwnProperty('layout') && this.config.layout === name;
             if(!this.config.hasOwnProperty('allowed') || this.config.allowed.indexOf(name) < 0) {
                 if(this.types.included.length > 0 && this.types.included.indexOf(path.extname(name).slice(1)) < 0) return;
                 if(this.types.excluded.length > 0 && this.types.excluded.indexOf(path.extname(name).slice(1)) >= 0) return;
             }
-            this.items.push(new File(fullPath));
+            this.items.push(new File(fullPath, isLayout));
         }
     }
 
     combine() {
         let output = '';
-        let layout = this.config.hasOwnProperty('layout') && this.config.layout ? this.config.layout : false;
+        let layout = '';
         for(let i = 0; i < this.items.length; i++) {
             let item = this.items[i];
-            if(layout && item.name === layout) {
-                layout = fs.readFileSync(item.fullPath).toString();
-                output = layout.replace('{combiner:layout}', output);
-                break;
-            }
-            output += '\n';
             if(item.type === 'folder') {
                 output += item.combine();
+            } else if(item.isLayout) {
+                layout = fs.readFileSync(item.fullPath).toString();
             } else {
-                output += fs.readFileSync(item.fullPath).toString();
+                let content = fs.readFileSync(item.fullPath).toString();
+                output += content;
+                if(content.length > 0) output += '\n';
             }
         }
+        if(layout) output = layout.replace('{combiner:layout}', output);
         return output;
     }
 
