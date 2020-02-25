@@ -22,7 +22,7 @@ Parameters
 relative or absolute path to a sources folder
 
 #### out
-relative or absolute path to a output file
+relative or absolute path to an output file
 
 #### ext
 file extensions for including
