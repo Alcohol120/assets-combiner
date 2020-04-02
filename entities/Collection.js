@@ -8,24 +8,15 @@ const Folder = require('./Folder');
 class Collection {
 
     constructor(config) {
-        this.types = {
-            included: [],
-            excluded: []
+        this.including = {
+            include: config.hasOwnProperty('include') ? config['include'] : [],
+            exclude: config.hasOwnProperty('exclude') ? config['exclude'] : []
         };
-        this.vars = config.hasOwnProperty('var') ? require(fs.realpathSync(config['var'])) : {};
-        if(config.hasOwnProperty('ext')) this.configureTypes(config['ext']);
-        this.sources = new Folder(config['src'], this.types);
-        this.outputPath = fs.realpathSync(path.dirname(config['out'])) + path.sep + path.basename(config['out']);
+        this.variables = config.hasOwnProperty('variables') ? config['variables'] : {};
+        this.sources = new Folder(config['sourceDir'], this.including);
+        this.outputPath = fs.realpathSync(path.dirname(config['outputFile']))
+            + path.sep + path.basename(config['outputFile']);
         this.output = '';
-    }
-
-    configureTypes(conf) {
-        if(conf.indexOf('*') >= 0) {
-            this.types.excluded = conf.split('|');
-            this.types.excluded.splice(this.types.excluded.indexOf('*'), 1);
-        } else {
-            this.types.included = conf.split('|');
-        }
     }
 
     combine() {
@@ -34,8 +25,8 @@ class Collection {
         // get content of a merged files
         this.output = this.sources.combine();
         // parse variables
-        for(let key in this.vars) {
-            this.parseVariable(key, this.vars[key]);
+        for(let key in this.variables) {
+            this.parseVariable(key, this.variables[key]);
         }
         // save
         fs.writeFileSync(this.outputPath, this.output);

@@ -8,10 +8,10 @@ const File = require('./File');
 
 class Folder extends Item {
 
-    constructor(fullPath, types) {
+    constructor(fullPath, including) {
         super(fullPath);
         this.type = 'folder';
-        this.types = types;
+        this.including = including;
         this.config = [];
         this.items = [];
         this.names = [];
@@ -19,16 +19,15 @@ class Folder extends Item {
 
     load() {
         let items = fs.readdirSync(this.fullPath);
-        // find config file
-        for(let i = 0; i < items.length; i++) {
-            if(items[i] !== 'combine.json') continue;
-            this.config = require(fs.realpathSync(this.fullPath + path.sep + items[i]));
+        // load configs
+        if(fs.existsSync(this.fullPath + path.sep + 'combiner.json')) {
+            this.config = require(this.fullPath + path.sep + 'combiner.json');
         }
         // collect first ordered items
-        if(this.config.hasOwnProperty('includingOrder') && this.config.includingOrder.length > 0) {
-            for(let i = 0; i < this.config.includingOrder.length; i++) {
-                if(this.config.hasOwnProperty('layout') && this.config.includingOrder[i] === this.config.layout) continue;
-                if(items.indexOf(this.config.includingOrder[i]) >= 0) this.collect(this.config.includingOrder[i]);
+        if(this.config.hasOwnProperty('order') && this.config.order.length > 0) {
+            for(let i = 0; i < this.config.order.length; i++) {
+                if(this.config.hasOwnProperty('layout') && this.config.order[i] === this.config.layout) continue;
+                if(items.indexOf(this.config.order[i]) >= 0) this.collect(this.config.order[i]);
             }
         }
         // collect all files
@@ -47,15 +46,30 @@ class Folder extends Item {
         if(isFolder && type && type !== 'folders') return;
         this.names.push(name);
         if(isFolder) {
-            this.items.push(new Folder(fullPath, this.types).load());
+            this.items.push(new Folder(fullPath, this.including).load());
         } else {
             let isLayout = this.config.hasOwnProperty('layout') && this.config.layout === name;
             if(!this.config.hasOwnProperty('allowed') || this.config.allowed.indexOf(name) < 0) {
-                if(this.types.included.length > 0 && this.types.included.indexOf(path.extname(name).slice(1)) < 0) return;
-                if(this.types.excluded.length > 0 && this.types.excluded.indexOf(path.extname(name).slice(1)) >= 0) return;
+                if(!this.isFileAllowed(name)) return;
             }
             this.items.push(new File(fullPath, isLayout));
         }
+    }
+
+    isFileAllowed(filename) {
+        if(this.including.include.length > 0) {
+            for(let i = 0; i < this.including.include.length; i++) {
+                const pattern = '^' + this.including.include[i].replace(/\*/g, '.*?') + '$';
+                if(!filename.match(new RegExp(pattern, 'i'))) return false;
+            }
+        }
+        if(this.including.exclude.length > 0) {
+            for(let i = 0; i < this.including.exclude.length; i++) {
+                const pattern = '^' + this.including.exclude[i].replace(/\*/g, '.*?') + '$';
+                if(filename.match(new RegExp(pattern, 'i'))) return false;
+            }
+        }
+        return true;
     }
 
     combine() {

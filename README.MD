@@ -8,38 +8,61 @@ Install
 
 Usage
 ---
-Merge content of all JS files located in ./source/folder directory into a file ./dist.js
 
-    node assets-combiner (src=./source/folder&out=./dist.js&ext=js)
+    node assets-combiner ./path/to/my-config.json
     
-Multiple configurations
+If you have configuration file in your working directory and it is called `assets-combiner.json` you can execute assets-combiner without parameters
 
-    node assets-combiner (src=./src/js&out=./dist1.js&ext=js) (src=./src/html&out=./index.html&ext=html)
+    node assets-combiner
     
-Parameters
----
-#### src
-relative or absolute path to a sources folder
+Multiple configuration files
 
-#### out
-relative or absolute path to an output file
+    node assets-combiner build-js.json build-css.json
 
-#### ext
-file extensions for including
+Example of configuration file
 
-`ext=js` - means only files with .js extensions can be included
+    {
+      "sourceDir": "src/js",
+      "outputFile": "dist/compiled.js",
+      "include": [
+        "*.js"
+      ],
+      "exclude": [
+        "*.test.js"
+      ],
+      "variables": {
+        "name": "Test JS combining"
+      }
+    }
+    
+Configuration files also can contain a multiple configurations. Example:
 
-`ext=html|htm` - .html and .htm files can be included
+    [
+      {
+        "sourceDir": "src/js",
+        "outputFile": "dist/compiled.js",
+        "include": [
+          "*.js"
+        ]
+      },
+      {
+        "sourceDir": "src/css",
+        "outputFile": "dist/compiled.css",
+        "include": [
+          "*.css"
+        ]
+      }
+    ]
+    
+**sourceDir** - relative or absolute path to a sources folder.
 
-`ext=*` - include files with any extension (except .json)
+**outputFile** - relative or absolute path to an output file.
 
-`ext=*|css` - include all files except .css
+**include** - array of filename patterns what can be merged.
 
-#### vars
-relative or absolute path to variables file
-`var=./my_vars.json`
+**exclude** - array of filename patterns what not be merged.
 
-this is a JSON file witch can contain some variables. Those variables can be included in output file with following tag: `{combiner:my_variable_name}`
+**variables** - array of variables. Those variables can be included in output file with the following tag: `{combiner:my_variable_name}`
 
 Including order
 ---
@@ -55,21 +78,21 @@ Will be merged with this order:
     file_1.js
     file_2.js
 
-combine.json file
+combiner.json file
 ---
-combine.json is an optional, config file witch can be placed in any sources directory.
+combiner.json is an optional, config file witch can be placed in any sources directory.
 
-combine.json provides you options to define merging order, including files witch not allowed by `ext` parameter and exclude allowed files.
+combiner.json provides you options to define merging order, including files witch not allowed by `include` parameter and exclude allowed files.
 
-#### Basic combine.json structure
+#### Basic combiner.json structure
 
     {
-        "includingOrder": [],
+        "order": [],
         "excluded": [],
         "allowed": []
     }
     
-#### includingOrder
+#### order
 
 Example files structure:
 
@@ -82,7 +105,7 @@ Example files structure:
     │   └── file_5.js
     └── file_1.js
     
-Example `includingOrder` of `src/sub_dir/combine.json`:
+Example `order` of `src/sub_dir/combine.json`:
 
     {
         "includingOrder": [
@@ -99,7 +122,7 @@ Files will be merged with following order:
     file_2.js
     file_5.js
     
-By default sub-directories includes after files. We can use `includingOrder` to include directory first, like this:
+By default sub-directories includes after files. We can use `order` to include directory first, like this:
 
     {
         "includingOrder": [
@@ -108,10 +131,10 @@ By default sub-directories includes after files. We can use `includingOrder` to 
     }
     
 #### excluded
-Files or folders witch will not be included in output file even though these allowed by `ext` parameter.
+Files or folders witch will not be included in output file even though these allowed by `include` parameter.
 
 #### allowed
-Files witch will be included in output file even though these is not allowed by `ext` parameter.
+Files witch will be included in output file even though these is not allowed by `include` parameter.
 
 #### layout
 If this property isset all files content will be inserted into layout file. Layout file should contain a `{combiner:layout}` tag. It will be replaced with merged content from other files.
