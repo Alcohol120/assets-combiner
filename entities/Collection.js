@@ -33,7 +33,8 @@ class Collection {
     }
 
     parseVariable(name, value) {
-        this.output = this.output.replace(new RegExp('\{combiner:' + name.toString() + '\}', 'g'), value.toString());
+        const needle = new RegExp(`{combiner:${name}}`, 'g');
+        this.output = this.output.replace(needle, value.toString().replace('$', '$$$$'));
     }
 
 }

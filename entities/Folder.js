@@ -87,7 +87,7 @@ class Folder extends Item {
                 if(content.length > 0) output += '\n';
             }
         }
-        if(layout) output = layout.replace('{combiner:layout}', output);
+        if(layout) output = layout.replace('{combiner:layout}', output.replace('$', '$$$$'));
         return output;
     }
 

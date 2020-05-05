@@ -1,6 +1,6 @@
 {
   "name": "assets-combiner",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": {
     "name": "Alco",
     "email": "head@alclab.pro",
@@ -13,12 +13,11 @@
     "node": ">=8"
   },
   "keywords": [
-    "assets-combiner",
     "assets",
-    "minify",
     "minifier",
-    "combine",
-    "assemble",
+    "combiner",
+    "assembler",
+    "bundler",
     "javascript",
     "ecmascript",
     "es5",
@@ -29,10 +28,7 @@
     "es2016",
     "es2017",
     "html",
-    "html5",
-    "css",
-    "css3",
-    "html5"
+    "css"
   ],
   "repository": {
     "type": "git",
