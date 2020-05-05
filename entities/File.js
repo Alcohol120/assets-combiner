@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const Item = require('./Item');
 
 class File extends Item {
@@ -8,6 +9,10 @@ class File extends Item {
         super(fullPath);
         this.type = 'file';
         this.isLayout = isLayout;
+    }
+
+    getContent() {
+        return fs.readFileSync(this.fullPath).toString();
     }
 
 }

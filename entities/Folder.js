@@ -18,10 +18,11 @@ class Folder extends Item {
     }
 
     load() {
-        let items = fs.readdirSync(this.fullPath);
+        const items = fs.readdirSync(this.fullPath);
         // load configs
-        if(fs.existsSync(this.fullPath + path.sep + 'combiner.json')) {
-            this.config = require(this.fullPath + path.sep + 'combiner.json');
+        const configPath = `${this.fullPath}${path.sep}combiner.json`;
+        if(fs.existsSync(configPath)) {
+            this.config = require(configPath);
         }
         // collect first ordered items
         if(this.config.hasOwnProperty('order') && this.config.order.length > 0) {
@@ -48,7 +49,7 @@ class Folder extends Item {
         if(isFolder) {
             this.items.push(new Folder(fullPath, this.including).load());
         } else {
-            let isLayout = this.config.hasOwnProperty('layout') && this.config.layout === name;
+            const isLayout = this.config.hasOwnProperty('layout') && this.config.layout === name;
             if(!this.config.hasOwnProperty('allowed') || this.config.allowed.indexOf(name) < 0) {
                 if(!this.isFileAllowed(name)) return;
             }
@@ -76,13 +77,13 @@ class Folder extends Item {
         let output = '';
         let layout = '';
         for(let i = 0; i < this.items.length; i++) {
-            let item = this.items[i];
+            const item = this.items[i];
             if(item.type === 'folder') {
                 output += item.combine();
             } else if(item.isLayout) {
-                layout = fs.readFileSync(item.fullPath).toString();
+                layout = item.getContent();
             } else {
-                let content = fs.readFileSync(item.fullPath).toString();
+                let content = item.getContent();
                 output += content;
                 if(content.length > 0) output += '\n';
             }
