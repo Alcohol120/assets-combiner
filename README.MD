@@ -35,7 +35,7 @@ Example of configuration file
       }
     }
     
-Configuration files also can contain a multiple configurations. Example:
+Multiple configurations:
 
     [
       {
@@ -53,6 +53,25 @@ Configuration files also can contain a multiple configurations. Example:
         ]
       }
     ]
+    
+Multiple configurations with shared variables:
+
+    {
+      "collections": [
+        {
+          "sourceDir": "src/js",
+          "outputFile": "dist/compiled.js",
+          "variables": {
+            "title": "override shared variable"
+          }
+        },
+        ...
+      ]
+      "variables": {
+        "name": "Test JS combining",
+        "title": "test title"
+      }
+    }
     
 **sourceDir** - relative or absolute path to a sources folder.
 

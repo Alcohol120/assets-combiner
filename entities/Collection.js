@@ -7,12 +7,12 @@ const Folder = require('./Folder');
 
 class Collection {
 
-    constructor(config) {
+    constructor(config, variables={}) {
         this.including = {
             include: config.hasOwnProperty('include') ? config['include'] : [],
             exclude: config.hasOwnProperty('exclude') ? config['exclude'] : []
         };
-        this.variables = config.hasOwnProperty('variables') ? config['variables'] : {};
+        this.variables = Object.assign({}, variables, config.hasOwnProperty('variables') ? config['variables'] : {});
         this.sources = new Folder(config['sourceDir'], this.including);
         this.outputPath = fs.realpathSync(path.dirname(config['outputFile']))
             + path.sep + path.basename(config['outputFile']);
