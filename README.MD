@@ -14,10 +14,6 @@ Usage
 If you have configuration file in your working directory and it is called `assets-combiner.json` you can execute assets-combiner without parameters
 
     node assets-combiner
-    
-Multiple configuration files
-
-    node assets-combiner build-js.json build-css.json
 
 Example of configuration file
 
@@ -72,6 +68,10 @@ Multiple configurations with shared variables:
         "title": "test title"
       }
     }
+    
+To combine only one configuration from multiple configurations use flag `-i INDEX_OF_CONFIGURATION`. Example:
+
+    node assets-combiner multi-config.json -i 1
     
 **sourceDir** - relative or absolute path to a sources folder.
 
