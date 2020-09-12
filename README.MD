@@ -75,7 +75,7 @@ To combine only one configuration from multiple configurations use flag `-i INDE
     
 **sourceDir** - relative or absolute path to a sources folder.
 
-**outputFile** - relative or absolute path to an output file.
+**outputFile** - relative or absolute path to an output file. If this parameter are missing result will be printed to a console.
 
 **include** - array of filename patterns what can be merged.
 

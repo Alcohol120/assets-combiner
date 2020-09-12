@@ -14,8 +14,9 @@ class Collection {
         };
         this.variables = Object.assign({}, variables, config.hasOwnProperty('variables') ? config['variables'] : {});
         this.sources = new Folder(config['sourceDir'], this.including);
-        this.outputPath = fs.realpathSync(path.dirname(config['outputFile']))
-            + path.sep + path.basename(config['outputFile']);
+        this.outputPath = config['outputFile']
+            ? fs.realpathSync(path.dirname(config['outputFile'])) + path.sep + path.basename(config['outputFile'])
+            : '';
         this.output = '';
     }
 
@@ -29,7 +30,9 @@ class Collection {
             this.parseVariable(key, this.variables[key]);
         }
         // save
-        fs.writeFileSync(this.outputPath, this.output);
+        if(this.outputPath) {
+            fs.writeFileSync(this.outputPath, this.output);
+        } else console.log(this.output);
     }
 
     parseVariable(name, value) {
