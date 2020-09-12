@@ -1,13 +1,13 @@
 {
   "name": "assets-combiner",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "author": {
     "name": "Alco",
     "email": "head@alclab.pro",
     "url": "http://alclab.pro/"
   },
   "description": "A simple tool for merging your source files into one file",
-  "homepage": "https://github.com/ALcohol120/assets-combiner",
+  "homepage": "https://github.com/Alcohol120/assets-combiner",
   "license": "MIT",
   "engines": {
     "node": ">=8"

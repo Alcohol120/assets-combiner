@@ -58,19 +58,24 @@ class Folder extends Item {
     }
 
     isFileAllowed(filename) {
+        let valid = false;
         if(this.including.include.length > 0) {
             for(let i = 0; i < this.including.include.length; i++) {
                 const pattern = '^' + this.including.include[i].replace(/\*/g, '.*?') + '$';
-                if(!filename.match(new RegExp(pattern, 'i'))) return false;
+                if(!filename.match(new RegExp(pattern, 'i'))) continue;
+                valid =  true;
+                break;
             }
         }
         if(this.including.exclude.length > 0) {
             for(let i = 0; i < this.including.exclude.length; i++) {
                 const pattern = '^' + this.including.exclude[i].replace(/\*/g, '.*?') + '$';
-                if(filename.match(new RegExp(pattern, 'i'))) return false;
+                if(!filename.match(new RegExp(pattern, 'i'))) continue;
+                valid = false;
+                break;
             }
         }
-        return true;
+        return valid;
     }
 
     combine() {
